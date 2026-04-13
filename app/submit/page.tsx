@@ -13,6 +13,7 @@ export default function SubmitPage() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [url, setUrl] = useState("");
+  const [license, setLicense] = useState("open-source");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -26,7 +27,7 @@ export default function SubmitPage() {
       const res = await fetch("/api/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, colorId, name, description, url }),
+        body: JSON.stringify({ type, colorId, name, description, url, license }),
       });
       if (!res.ok) throw new Error("Submission failed");
       setSubmitted(true);
@@ -130,18 +131,37 @@ export default function SubmitPage() {
             />
           </div>
 
-          {/* URL (tools only) */}
+          {/* URL + License (tools only) */}
           {type === "tool" && (
-            <div>
-              <label className="block text-xs text-slate-400 mb-2 font-medium uppercase tracking-wider">URL (optional)</label>
-              <input
-                type="url"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder="https://..."
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-500"
-              />
-            </div>
+            <>
+              <div>
+                <label className="block text-xs text-slate-400 mb-2 font-medium uppercase tracking-wider">URL (optional)</label>
+                <input
+                  type="url"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder="https://..."
+                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-400 mb-2 font-medium uppercase tracking-wider">License</label>
+                <div className="flex gap-2">
+                  {(["open-source", "freemium", "commercial"] as const).map((l) => (
+                    <button
+                      key={l}
+                      type="button"
+                      onClick={() => setLicense(l)}
+                      className={`flex-1 py-2 rounded-lg border text-sm font-medium capitalize transition-all ${
+                        license === l ? "border-indigo-500 bg-indigo-950 text-white" : "border-slate-700 bg-slate-900 text-slate-400 hover:border-slate-500"
+                      }`}
+                    >
+                      {l}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
           )}
 
           {error && <p className="text-sm text-red-400">{error}</p>}

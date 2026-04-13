@@ -54,7 +54,7 @@ async function main() {
 
     if (!meta || meta.status !== "pending") continue;
 
-    const { type, colorId, name, url, body } = meta;
+    const { type, colorId, name, url, license, body } = meta;
 
     if (!VALID_TEAM_IDS.includes(colorId)) {
       console.warn(`Skipping ${file}: unknown colorId "${colorId}"`);
@@ -66,13 +66,15 @@ async function main() {
     }
 
     const description = body || "";
+    const validLicenses = ["open-source", "freemium", "commercial"];
+    const resolvedLicense = validLicenses.includes(license) ? license : "freemium";
 
     if (type === "tool") {
       communityData[colorId].tools.push({
         name,
         description,
         url: url || "",
-        license: "freemium",
+        license: resolvedLicense,
         tags: ["community"],
       });
     } else if (type === "team") {
