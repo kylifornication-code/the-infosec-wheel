@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { COLOR_TEAMS, ColorTeam } from "@/lib/data";
+import { MERGED_COLOR_TEAMS as COLOR_TEAMS, ColorTeam } from "@/lib/data";
 
 const WHEEL_ORDER = ["red", "orange", "yellow", "green", "blue", "purple", "white"];
 const ORDERED_TEAMS = WHEEL_ORDER.map((id) => COLOR_TEAMS.find((t) => t.id === id)!);

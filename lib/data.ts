@@ -1,3 +1,5 @@
+import communityData from "./community-data.json";
+
 export type Tool = {
   name: string;
   description: string;
@@ -242,6 +244,21 @@ export const COLOR_TEAMS: ColorTeam[] = [
   },
 ];
 
+// Merge community submissions into each team at build time
+type CommunityEntry = { tools: Tool[]; teams: Team[]; roles: Role[] };
+const community = communityData as Record<string, CommunityEntry>;
+
+export const MERGED_COLOR_TEAMS: ColorTeam[] = COLOR_TEAMS.map((team) => {
+  const c = community[team.id];
+  if (!c) return team;
+  return {
+    ...team,
+    tools: [...team.tools, ...c.tools],
+    teams: [...team.teams, ...c.teams],
+    roles: [...team.roles, ...c.roles],
+  };
+});
+
 export function getTeamById(id: string): ColorTeam | undefined {
-  return COLOR_TEAMS.find((t) => t.id === id);
+  return MERGED_COLOR_TEAMS.find((t) => t.id === id);
 }
