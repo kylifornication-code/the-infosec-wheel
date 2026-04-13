@@ -54,7 +54,7 @@ async function main() {
 
     if (!meta || meta.status !== "pending") continue;
 
-    const { type, colorId, name, url, license, body } = meta;
+    const { type, colorId, name, url, license, certifications, body } = meta;
 
     if (!VALID_TEAM_IDS.includes(colorId)) {
       console.warn(`Skipping ${file}: unknown colorId "${colorId}"`);
@@ -80,10 +80,13 @@ async function main() {
     } else if (type === "team") {
       communityData[colorId].teams.push({ name, description });
     } else if (type === "role") {
+      const certList = certifications
+        ? certifications.split(",").map((c) => c.trim()).filter(Boolean)
+        : [];
       communityData[colorId].roles.push({
         title: name,
         description,
-        certifications: [],
+        certifications: certList,
       });
     }
 

@@ -14,9 +14,28 @@ export default function SubmitPage() {
   const [description, setDescription] = useState("");
   const [url, setUrl] = useState("");
   const [license, setLicense] = useState("open-source");
+  const [certifications, setCertifications] = useState<string[]>([]);
+  const [certInput, setCertInput] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  function addCert(raw: string) {
+    const cert = raw.trim().toUpperCase();
+    if (cert && !certifications.includes(cert)) {
+      setCertifications((prev) => [...prev, cert]);
+    }
+    setCertInput("");
+  }
+
+  function handleCertKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      addCert(certInput);
+    } else if (e.key === "Backspace" && certInput === "" && certifications.length > 0) {
+      setCertifications((prev) => prev.slice(0, -1));
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +46,7 @@ export default function SubmitPage() {
       const res = await fetch("/api/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, colorId, name, description, url, license }),
+        body: JSON.stringify({ type, colorId, name, description, url, license, certifications }),
       });
       if (!res.ok) throw new Error("Submission failed");
       setSubmitted(true);
@@ -130,6 +149,43 @@ export default function SubmitPage() {
               className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-500 resize-none"
             />
           </div>
+
+          {/* Certifications (roles only) */}
+          {type === "role" && (
+            <div>
+              <label className="block text-xs text-slate-400 mb-2 font-medium uppercase tracking-wider">
+                Certifications <span className="normal-case font-normal">(optional)</span>
+              </label>
+              <div className="w-full min-h-[44px] bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 flex flex-wrap gap-1.5 focus-within:border-indigo-500 transition-colors">
+                {certifications.map((cert) => (
+                  <span
+                    key={cert}
+                    className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium bg-indigo-950 border border-indigo-700 text-indigo-300"
+                  >
+                    {cert}
+                    <button
+                      type="button"
+                      onClick={() => setCertifications((prev) => prev.filter((c) => c !== cert))}
+                      className="text-indigo-400 hover:text-white leading-none"
+                      aria-label={`Remove ${cert}`}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+                <input
+                  type="text"
+                  value={certInput}
+                  onChange={(e) => setCertInput(e.target.value)}
+                  onKeyDown={handleCertKeyDown}
+                  onBlur={() => addCert(certInput)}
+                  placeholder={certifications.length === 0 ? "e.g. OSCP, CEH, CISSP — press Enter to add" : "Add another…"}
+                  className="flex-1 min-w-[140px] bg-transparent text-sm focus:outline-none text-white placeholder:text-slate-600"
+                />
+              </div>
+              <p className="mt-1.5 text-xs text-slate-600">Press Enter or comma to add each cert. Backspace removes the last one.</p>
+            </div>
+          )}
 
           {/* URL + License (tools only) */}
           {type === "tool" && (

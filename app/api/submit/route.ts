@@ -7,7 +7,7 @@ const SUBMISSIONS_PATH = "submissions";
 
 export async function POST(req: NextRequest) {
   try {
-    const { type, colorId, name, description, url, license } = await req.json();
+    const { type, colorId, name, description, url, license, certifications } = await req.json();
 
     if (!type || !colorId || !name || !description) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
 
     const validLicenses = ["open-source", "freemium", "commercial"];
     const resolvedLicense = validLicenses.includes(license) ? license : "freemium";
+    const certList = Array.isArray(certifications) ? certifications.filter(Boolean) : [];
 
     const content = `---
 type: ${type}
@@ -32,6 +33,7 @@ colorId: ${colorId}
 name: ${name}
 url: ${url || ""}
 license: ${type === "tool" ? resolvedLicense : ""}
+certifications: ${type === "role" && certList.length > 0 ? certList.join(", ") : ""}
 submittedAt: ${new Date().toISOString()}
 status: pending
 ---
