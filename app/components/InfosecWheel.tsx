@@ -197,9 +197,9 @@ export default function InfosecWheel({ onSelect, selected, expanded, onToggleExp
             </text>
           )}
 
-          {/* Pointer triangle — fixed at top, points down to wheel edge */}
+          {/* Pointer triangle — fixed on right side, points left into wheel edge */}
           <polygon
-            points={`${CX},${CY - OUTER_R + 4} ${CX - 9},${CY - OUTER_R - 16} ${CX + 9},${CY - OUTER_R - 16}`}
+            points={`${CX + OUTER_R - 4},${CY} ${CX + OUTER_R + 16},${CY - 9} ${CX + OUTER_R + 16},${CY + 9}`}
             fill={selected ? selected.hex : "white"}
             opacity="0.95"
             style={{ transition: "fill 0.4s ease" }}
